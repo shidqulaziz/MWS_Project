@@ -24,7 +24,7 @@ def main():
     
     # Import dan jalankan Flask app
     try:
-        from app import app
+        from app_secure import app  # Gunakan versi secure
         app.run(debug=True, host='0.0.0.0', port=5000)
     except ImportError as e:
         print(f"❌ Error importing Flask app: {e}")
