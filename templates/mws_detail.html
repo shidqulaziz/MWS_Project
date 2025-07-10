@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}MWS {{ part.partNumber }} - Sistem Aircraft Maintenance{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">
+                            MWS: {{ part.partNumber }} - {{ part.description }}
+                        </h1>
+                        <p class="text-gray-600">Serial Number: {{ part.serialNumber }}</p>
+                    </div>
+                </div>
+                <span class="px-4 py-2 rounded-full text-sm font-medium
+                    {% if part.status == 'completed' %}bg-green-100 text-green-800
+                    {% elif part.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {% if part.status == 'completed' %}Selesai
+                    {% elif part.status == 'in_progress' %}Sedang Dikerjakan
+                    {% else %}Menunggu{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- MWS Header Information -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Informasi MWS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">WBS No.</label>
+                    <p class="text-gray-900">{{ part.wbsNo }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Worksheet No.</label>
+                    <p class="text-gray-900">{{ part.worksheetNo }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">IWO No.</label>
+                    <p class="text-gray-900">{{ part.iwoNo }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Shop Area</label>
+                    <p class="text-gray-900">{{ part.shopArea }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Customer</label>
+                    <p class="text-gray-900">{{ part.customer }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">A/C Type</label>
+                    <p class="text-gray-900">{{ part.acType }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Revision</label>
+                    <p class="text-gray-900">{{ part.revision }}</p>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 mb-1">Target Date</label>
+                    <p class="text-gray-900">{{ part.targetDate }}</p>
+                </div>
+            </div>
+            
+            {% if user.role in ['admin', 'superadmin'] %}
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tugaskan ke Mechanic</label>
+                <select onchange="assignPart('{{ part_id }}', this.value)" 
+                        class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">Pilih Mechanic</option>
+                    {% for nik, user_data in users.items() %}
+                        {% if user_data.role == 'mechanic' %}
+                        <option value="{{ nik }}" {% if part.assignedTo == nik %}selected{% endif %}>
+                            {{ user_data.name }}
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- MWS Work Steps Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Maintenance Work Sheet</h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="worksheet-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="w-12">NO</th>
+                            <th class="w-1/2">DESCRIPTION</th>
+                            <th class="w-20">MAN</th>
+                            <th class="w-20">HOURS</th>
+                            <th class="w-20">TECH</th>
+                            <th class="w-20">INSP</th>
+                            <th class="w-24">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for step in part.steps %}
+                        <tr class="{% if step.status == 'completed' %}bg-green-50
+                                  {% elif step.status == 'in_progress' %}bg-yellow-50
+                                  {% else %}bg-white{% endif %}">
+                            <td class="text-center font-medium">{{ step.no }}</td>
+                            <td class="text-sm">
+                                <div class="whitespace-pre-line">{{ step.description }}</div>
+                                {% if step.completedBy %}
+                                <div class="mt-2 text-xs text-gray-600">
+                                    Completed by: {{ users[step.completedBy].name if step.completedBy in users else step.completedBy }}
+                                    {% if step.completedDate %}on {{ step.completedDate }}{% endif %}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.role == 'mechanic' and part.assignedTo == user.nik %}
+                                <input type="text" value="{{ step.man }}" 
+                                       onchange="updateStepField('{{ part_id }}', {{ step.no }}, 'man', this.value)"
+                                       class="w-full">
+                                {% else %}
+                                <input type="text" value="{{ step.man }}" disabled class="w-full">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.role == 'mechanic' and part.assignedTo == user.nik %}
+                                <input type="text" value="{{ step.hours }}" 
+                                       onchange="updateStepField('{{ part_id }}', {{ step.no }}, 'hours', this.value)"
+                                       class="w-full">
+                                {% else %}
+                                <input type="text" value="{{ step.hours }}" disabled class="w-full">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.role == 'mechanic' and part.assignedTo == user.nik %}
+                                <input type="text" value="{{ step.tech }}" 
+                                       onchange="updateStepField('{{ part_id }}', {{ step.no }}, 'tech', this.value)"
+                                       class="w-full">
+                                {% else %}
+                                <input type="text" value="{{ step.tech }}" disabled class="w-full">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.role == 'quality1' %}
+                                <input type="text" value="{{ step.insp }}" 
+                                       onchange="updateStepField('{{ part_id }}', {{ step.no }}, 'insp', this.value)"
+                                       class="w-full">
+                                {% else %}
+                                <input type="text" value="{{ step.insp }}" disabled class="w-full">
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if step.status == 'completed' %}
+                                    <i class="fas fa-check-circle text-green-500"></i>
+                                {% elif step.status == 'in_progress' %}
+                                    <i class="fas fa-clock text-yellow-500"></i>
+                                {% else %}
+                                    {% if user.role == 'mechanic' and part.assignedTo == user.nik %}
+                                    <button onclick="updateStepStatus('{{ part_id }}', {{ step.no }}, 'in_progress')"
+                                            class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-xs">
+                                        Start
+                                    </button>
+                                    {% else %}
+                                    <i class="fas fa-circle text-gray-300"></i>
+                                    {% endif %}
+                                {% endif %}
+                                
+                                {% if step.status == 'in_progress' and user.role == 'mechanic' and part.assignedTo == user.nik %}
+                                <button onclick="updateStepStatus('{{ part_id }}', {{ step.no }}, 'completed')"
+                                        class="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs ml-1">
+                                    Done
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dates and Signatures -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <!-- Dates Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Tanggal</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        {% if user.role == 'mechanic' and part.assignedTo == user.nik %}
+                        <input type="date" value="{{ part.startDate }}" 
+                               onchange="updateDates('{{ part_id }}', 'startDate', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        {% else %}
+                        <input type="date" value="{{ part.startDate }}" disabled
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Finish Date</label>
+                        {% if user.role == 'mechanic' and part.assignedTo == user.nik %}
+                        <input type="date" value="{{ part.finishDate }}" 
+                               onchange="updateDates('{{ part_id }}', 'finishDate', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        {% else %}
+                        <input type="date" value="{{ part.finishDate }}" disabled
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signatures Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Tanda Tangan</h3>
+                <div class="space-y-4">
+                    <!-- Prepared By -->
+                    <div class="signature-box {% if part.preparedBy %}signed{% endif %}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium text-gray-800">Prepared By</h4>
+                                {% if part.preparedBy %}
+                                <p class="text-sm text-gray-600">{{ users[part.preparedBy].name if part.preparedBy in users else part.preparedBy }}</p>
+                                <p class="text-xs text-gray-500">{{ part.preparedDate }}</p>
+                                {% else %}
+                                <p class="text-sm text-gray-500">Belum ditandatangani</p>
+                                {% endif %}
+                            </div>
+                            {% if user.role == 'admin' and not part.preparedBy %}
+                            <button onclick="signDocument('prepared')"
+                                    class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm">
+                                Sign
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Approved By -->
+                    <div class="signature-box {% if part.approvedBy %}signed{% endif %}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium text-gray-800">Approved By</h4>
+                                {% if part.approvedBy %}
+                                <p class="text-sm text-gray-600">{{ users[part.approvedBy].name if part.approvedBy in users else part.approvedBy }}</p>
+                                <p class="text-xs text-gray-500">{{ part.approvedDate }}</p>
+                                {% else %}
+                                <p class="text-sm text-gray-500">Belum ditandatangani</p>
+                                {% endif %}
+                            </div>
+                            {% if user.role == 'superadmin' and not part.approvedBy %}
+                            <button onclick="signDocument('approved')"
+                                    class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm">
+                                Sign
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Verified By -->
+                    <div class="signature-box {% if part.verifiedBy %}signed{% endif %}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-medium text-gray-800">Verified By</h4>
+                                {% if part.verifiedBy %}
+                                <p class="text-sm text-gray-600">{{ users[part.verifiedBy].name if part.verifiedBy in users else part.verifiedBy }}</p>
+                                <p class="text-xs text-gray-500">{{ part.verifiedDate }}</p>
+                                {% else %}
+                                <p class="text-sm text-gray-500">Belum ditandatangani</p>
+                                {% endif %}
+                            </div>
+                            {% if user.role == 'quality2' and not part.verifiedBy %}
+                            <button onclick="signDocument('verified')"
+                                    class="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white rounded text-sm">
+                                Sign
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateStepField(partId, stepNo, field, value) {
+    fetch('/update_step_field', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            partId: partId,
+            stepNo: stepNo,
+            field: field,
+            value: value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Field updated successfully', 'success');
+        } else {
+            showNotification('Error updating field: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error updating field', 'error');
+    });
+}
+
+function updateStepStatus(partId, stepNo, status) {
+    fetch('/update_step_status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            partId: partId,
+            stepNo: stepNo,
+            status: status
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error updating step status: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating step status');
+    });
+}
+
+function assignPart(partId, assignedTo) {
+    if (!assignedTo) return;
+    
+    fetch('/assign_part', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            partId: partId,
+            assignedTo: assignedTo
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error assigning part: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error assigning part');
+    });
+}
+
+function updateDates(partId, field, value) {
+    fetch('/update_dates', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            partId: partId,
+            field: field,
+            value: value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Date updated successfully', 'success');
+        } else {
+            showNotification('Error updating date: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error updating date', 'error');
+    });
+}
+
+function signDocument(type) {
+    const partId = '{{ part_id }}';
+    fetch('/sign_document', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            partId: partId,
+            type: type
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error signing document: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error signing document');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}
