@@ -237,7 +237,7 @@
                                 {% endif %}
                             </div>
                             {% if user.role == 'admin' and not part.preparedBy %}
-                            <button onclick="signDocument('prepared')"
+                            <button onclick="signDocument('{{ part_id }}', 'prepared')"
                                     class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm">
                                 Sign
                             </button>
@@ -258,7 +258,7 @@
                                 {% endif %}
                             </div>
                             {% if user.role == 'superadmin' and not part.approvedBy %}
-                            <button onclick="signDocument('approved')"
+                            <button onclick="signDocument('{{ part_id }}', 'approved')"
                                     class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm">
                                 Sign
                             </button>
@@ -279,7 +279,7 @@
                                 {% endif %}
                             </div>
                             {% if user.role == 'quality2' and not part.verifiedBy %}
-                            <button onclick="signDocument('verified')"
+                            <button onclick="signDocument('{{ part_id }}', 'verified')"
                                     class="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white rounded text-sm">
                                 Sign
                             </button>
@@ -399,8 +399,7 @@ function updateDates(partId, field, value) {
     });
 }
 
-function signDocument(type) {
-    const partId = '{{ part_id }}';
+function signDocument(partId, type) {
     fetch('/sign_document', {
         method: 'POST',
         headers: {
@@ -414,14 +413,15 @@ function signDocument(type) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            showNotification('Dokumen berhasil ditandatangani', 'success');
             location.reload();
         } else {
-            alert('Error signing document: ' + data.error);
+            showNotification('Error signing document: ' + data.error, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error signing document');
+        showNotification('Error signing document', 'error');
     });
 }
 
