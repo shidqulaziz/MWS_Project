@@ -3,263 +3,253 @@
 {% block title %}Admin Dashboard - Sistem Aircraft Maintenance{% endblock %}
 
 {% block content %}
-<div class="min-vh-100 bg-light">
+<div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
-        <div class="container">
-            <div class="d-flex align-items-center">
-                <div class="role-admin p-3 rounded me-3">
-                    <i class="fas fa-user-shield text-white fs-4"></i>
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="role-admin p-3 rounded-lg mr-4">
+                        <i class="fas fa-user-shield text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">
+                            Admin Dashboard
+                        </h1>
+                        <p class="text-gray-600">{{ user.name }} ({{ user.nik }}) - {{ user.description }}</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="navbar-brand mb-0 fs-3 fw-bold">
-                        Admin Dashboard
-                    </h1>
-                    <p class="text-muted mb-0">{{ user.name }} ({{ user.nik }}) - {{ user.description }}</p>
+                <div class="flex space-x-3">
+                    <a href="{{ url_for('create_mws') }}" 
+                       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Buat MWS
+                    </a>
+                    <a href="{{ url_for('logout') }}" 
+                       class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </a>
                 </div>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{{ url_for('create_mws') }}" class="btn btn-success">
-                    <i class="fas fa-plus me-2"></i>
-                    Buat MWS
-                </a>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
-                    <i class="fas fa-sign-out-alt me-2"></i>
-                    Logout
-                </a>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="container my-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Admin Features -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
-                                <i class="fas fa-plus-circle text-primary fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-1">Buat MWS Baru</h5>
-                                <p class="card-text text-muted small mb-0">Tambah maintenance work sheet</p>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('create_mws') }}" class="btn btn-primary w-100">
-                            Buat MWS
-                        </a>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                        <i class="fas fa-plus-circle text-blue-600 text-xl"></i>
                     </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">Buat MWS Baru</h3>
+                        <p class="text-sm text-gray-600">Tambah maintenance work sheet</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{{ url_for('create_mws') }}" 
+                       class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors inline-block text-center">
+                        Buat MWS
+                    </a>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-success bg-opacity-10 p-3 rounded me-3">
-                                <i class="fas fa-users text-success fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-1">Kelola Tim</h5>
-                                <p class="card-text text-muted small mb-0">Assign parts ke mechanic</p>
-                            </div>
-                        </div>
-                        <small class="text-muted">{{ users.values()|selectattr('role', 'equalto', 'mechanic')|list|length }} Mechanic Aktif</small>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-lg mr-4">
+                        <i class="fas fa-users text-green-600 text-xl"></i>
                     </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">Kelola Tim</h3>
+                        <p class="text-sm text-gray-600">Assign parts ke mechanic</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <span class="text-sm text-gray-500">{{ users.values()|selectattr('role', 'equalto', 'mechanic')|list|length }} Mechanic Aktif</span>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-info bg-opacity-10 p-3 rounded me-3">
-                                <i class="fas fa-signature text-info fs-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-1">Prepared By</h5>
-                                <p class="card-text text-muted small mb-0">Tanda tangan dokumen</p>
-                            </div>
-                        </div>
-                        {% set unsigned_parts = parts.values()|selectattr('preparedBy', 'equalto', '')|list|length %}
-                        <small class="{% if unsigned_parts > 0 %}text-warning{% else %}text-success{% endif %}">
-                            {{ unsigned_parts }} Menunggu Signature
-                        </small>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-purple-100 rounded-lg mr-4">
+                        <i class="fas fa-signature text-purple-600 text-xl"></i>
                     </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">Prepared By</h3>
+                        <p class="text-sm text-gray-600">Tanda tangan dokumen</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    {% set unsigned_parts = parts.values()|selectattr('preparedBy', 'equalto', '')|list|length %}
+                    <span class="text-sm {% if unsigned_parts > 0 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                        {{ unsigned_parts }} Menunggu Signature
+                    </span>
                 </div>
             </div>
         </div>
 
         <!-- Statistics Cards -->
-        <div class="row g-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {% set total_parts = parts|length %}
             {% set completed_parts = parts.values()|selectattr('status', 'equalto', 'completed')|list|length %}
             {% set in_progress_parts = parts.values()|selectattr('status', 'equalto', 'in_progress')|list|length %}
             {% set pending_parts = parts.values()|selectattr('status', 'equalto', 'pending')|list|length %}
             
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
-                            <i class="fas fa-cogs text-primary fs-4"></i>
-                        </div>
-                        <div>
-                            <p class="card-text text-muted mb-1">Total Parts</p>
-                            <h3 class="card-title mb-0">{{ total_parts }}</h3>
-                        </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                        <i class="fas fa-cogs text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Parts</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_parts }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-success bg-opacity-10 p-3 rounded me-3">
-                            <i class="fas fa-check-circle text-success fs-4"></i>
-                        </div>
-                        <div>
-                            <p class="card-text text-muted mb-1">Selesai</p>
-                            <h3 class="card-title mb-0">{{ completed_parts }}</h3>
-                        </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-lg mr-4">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Selesai</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ completed_parts }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
-                            <i class="fas fa-clock text-warning fs-4"></i>
-                        </div>
-                        <div>
-                            <p class="card-text text-muted mb-1">Sedang Dikerjakan</p>
-                            <h3 class="card-title mb-0">{{ in_progress_parts }}</h3>
-                        </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-yellow-100 rounded-lg mr-4">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Sedang Dikerjakan</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ in_progress_parts }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="bg-secondary bg-opacity-10 p-3 rounded me-3">
-                            <i class="fas fa-pause-circle text-secondary fs-4"></i>
-                        </div>
-                        <div>
-                            <p class="card-text text-muted mb-1">Menunggu</p>
-                            <h3 class="card-title mb-0">{{ pending_parts }}</h3>
-                        </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gray-100 rounded-lg mr-4">
+                        <i class="fas fa-pause-circle text-gray-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Menunggu</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ pending_parts }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Parts Management -->
-        <div class="card">
-            <div class="card-header bg-white">
-                <h2 class="card-title mb-0 d-flex align-items-center">
-                    <i class="fas fa-list-alt me-3 text-primary"></i>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-list-alt mr-3 text-blue-600"></i>
                     Kelola Semua Parts
                 </h2>
             </div>
             
-            <div class="card-body">
+            <div class="p-6">
                 {% if parts %}
-                    <div class="row g-4">
+                    <div class="space-y-6">
                         {% for part_id, part in parts.items() %}
-                        <div class="col-12">
-                            <div class="card border card-hover">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <h5 class="card-title me-3 mb-0">
-                                                    {{ part.partNumber }} - {{ part.description }}
-                                                </h5>
-                                                <span class="badge 
-                                                    {% if part.status == 'completed' %}bg-success
-                                                    {% elif part.status == 'in_progress' %}bg-warning
-                                                    {% else %}bg-secondary{% endif %}">
-                                                    {% if part.status == 'completed' %}Selesai
-                                                    {% elif part.status == 'in_progress' %}Sedang Dikerjakan
-                                                    {% else %}Menunggu{% endif %}
-                                                </span>
-                                            </div>
-                                            <div class="row g-3">
-                                                <div class="col-md-3">
-                                                    <small class="text-muted">SN:</small> {{ part.serialNumber }}
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-muted">Customer:</small> {{ part.customer }}
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-muted">Target:</small> {{ part.targetDate }}
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-muted">Assigned:</small> 
-                                                    {% if part.assignedTo and part.assignedTo in users %}
-                                                        {{ users[part.assignedTo].name }}
-                                                    {% else %}
-                                                        <span class="text-warning">Belum ditugaskan</span>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="ms-3">
-                                            <a href="{{ url_for('mws_detail', part_id=part_id) }}" class="btn btn-primary">
-                                                <i class="fas fa-eye me-2"></i>
-                                                Kelola MWS
-                                            </a>
-                                        </div>
+                        <div class="border border-gray-200 rounded-lg p-6 card-hover">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-2">
+                                        <h3 class="text-lg font-semibold text-gray-800 mr-3">
+                                            {{ part.partNumber }} - {{ part.description }}
+                                        </h3>
+                                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                                            {% if part.status == 'completed' %}bg-green-100 text-green-800
+                                            {% elif part.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {% if part.status == 'completed' %}Selesai
+                                            {% elif part.status == 'in_progress' %}Sedang Dikerjakan
+                                            {% else %}Menunggu{% endif %}
+                                        </span>
                                     </div>
-
-                                    <!-- Progress Bar -->
-                                    <div class="mb-3">
-                                        {% set completed_steps = part.steps|selectattr('status', 'equalto', 'completed')|list|length %}
-                                        {% set total_steps = part.steps|length %}
-                                        {% set progress_percentage = (completed_steps / total_steps * 100)|round|int %}
-                                        
-                                        <div class="d-flex justify-content-between small text-muted mb-2">
-                                            <span>Progress: {{ completed_steps }}/{{ total_steps }} steps</span>
-                                            <span>{{ progress_percentage }}%</span>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                                        <div>
+                                            <span class="font-medium">SN:</span> {{ part.serialNumber }}
                                         </div>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-primary progress-bar-custom" style="width: {{ progress_percentage }}%"></div>
+                                        <div>
+                                            <span class="font-medium">Customer:</span> {{ part.customer }}
                                         </div>
-                                    </div>
-
-                                    <!-- Admin Actions -->
-                                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                        <div class="d-flex align-items-center gap-3">
-                                            {% if not part.preparedBy %}
-                                            <span class="text-warning small">
-                                                <i class="fas fa-exclamation-triangle me-1"></i>
-                                                Perlu Prepared By
-                                            </span>
+                                        <div>
+                                            <span class="font-medium">Target:</span> {{ part.targetDate }}
+                                        </div>
+                                        <div>
+                                            <span class="font-medium">Assigned:</span> 
+                                            {% if part.assignedTo and part.assignedTo in users %}
+                                                {{ users[part.assignedTo].name }}
                                             {% else %}
-                                            <span class="text-success small">
-                                                <i class="fas fa-check me-1"></i>
-                                                Prepared By: {{ users[part.preparedBy].name if part.preparedBy in users else part.preparedBy }}
-                                            </span>
+                                                <span class="text-yellow-600">Belum ditugaskan</span>
                                             {% endif %}
                                         </div>
-                                        <small class="text-muted">
-                                            Created: {{ part.worksheetNo }}
-                                        </small>
                                     </div>
                                 </div>
+                                <div class="ml-4">
+                                    <a href="{{ url_for('mws_detail', part_id=part_id) }}" 
+                                       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                        <i class="fas fa-eye mr-2"></i>
+                                        Kelola MWS
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="mb-4">
+                                {% set completed_steps = part.steps|selectattr('status', 'equalto', 'completed')|list|length %}
+                                {% set total_steps = part.steps|length %}
+                                {% set progress_percentage = (completed_steps / total_steps * 100)|round|int %}
+                                
+                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                    <span>Progress: {{ completed_steps }}/{{ total_steps }} steps</span>
+                                    <span>{{ progress_percentage }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-blue-600 h-3 rounded-full progress-bar-custom" 
+                                         style="width: {{ progress_percentage }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Admin Actions -->
+                            <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+                                <div class="flex items-center space-x-4">
+                                    {% if not part.preparedBy %}
+                                    <span class="text-yellow-600 text-sm">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        Perlu Prepared By
+                                    </span>
+                                    {% else %}
+                                    <span class="text-green-600 text-sm">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Prepared By: {{ users[part.preparedBy].name if part.preparedBy in users else part.preparedBy }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-sm text-gray-500">
+                                    Created: {{ part.worksheetNo }}
+                                </span>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-plus-circle text-muted display-1 mb-3"></i>
-                        <h4 class="text-muted mb-2">Belum ada MWS</h4>
-                        <p class="text-muted mb-4">Mulai dengan membuat Maintenance Work Sheet pertama.</p>
-                        <a href="{{ url_for('create_mws') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>
+                    <div class="text-center py-12">
+                        <i class="fas fa-plus-circle text-gray-400 text-6xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada MWS</h3>
+                        <p class="text-gray-500 mb-4">Mulai dengan membuat Maintenance Work Sheet pertama.</p>
+                        <a href="{{ url_for('create_mws') }}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
                             Buat MWS Pertama
                         </a>
                     </div>

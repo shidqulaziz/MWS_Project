@@ -3,82 +3,85 @@
 {% block title %}Login - Sistem MWS Aircraft Maintenance{% endblock %}
 
 {% block content %}
-<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5);">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-lg border-0">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <div class="bg-primary p-3 rounded-circle d-inline-flex mb-3">
-                                <i class="fas fa-plane text-white fs-2"></i>
-                            </div>
-                            <h2 class="card-title fw-bold mb-2">
-                                Sistem MWS Aircraft Maintenance
-                            </h2>
-                            <p class="text-muted">
-                                {% if selected_role %}
-                                    Login sebagai {{ selected_role|title }}
-                                {% else %}
-                                    Masuk dengan NIK dan password Anda
-                                {% endif %}
-                            </p>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+    <div class="max-w-md w-full mx-4">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+            <div class="text-center mb-8">
+                <div class="bg-blue-600 p-4 rounded-full inline-flex mb-4">
+                    <i class="fas fa-plane text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                    Sistem MWS Aircraft Maintenance
+                </h2>
+                <p class="text-gray-600">
+                    {% if selected_role %}
+                        Login sebagai {{ selected_role|title }}
+                    {% else %}
+                        Masuk dengan NIK dan password Anda
+                    {% endif %}
+                </p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}">
+                            {{ message }}
                         </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show">
-                                        {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label for="nik" class="block text-sm font-medium text-gray-700 mb-2">
+                        NIK (3 digit)
+                    </label>
+                    <input type="text" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                           id="nik" 
+                           name="nik" 
+                           required 
+                           maxlength="3" 
+                           placeholder="Masukkan NIK Anda">
+                </div>
 
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label for="nik" class="form-label fw-medium">
-                                    NIK (3 digit)
-                                </label>
-                                <input type="text" class="form-control form-control-lg" id="nik" name="nik" 
-                                       required maxlength="3" placeholder="Masukkan NIK Anda">
-                            </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        Password
+                    </label>
+                    <input type="password" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                           id="password" 
+                           name="password" 
+                           required 
+                           placeholder="Masukkan password Anda">
+                </div>
 
-                            <div class="mb-4">
-                                <label for="password" class="form-label fw-medium">
-                                    Password
-                                </label>
-                                <input type="password" class="form-control form-control-lg" id="password" name="password" 
-                                       required placeholder="Masukkan password Anda">
-                            </div>
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Masuk
+                </button>
+            </form>
 
-                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-                                <i class="fas fa-sign-in-alt me-2"></i>
-                                Masuk
-                            </button>
-                        </form>
+            <div class="text-center mt-6">
+                <p class="text-gray-600">
+                    Kembali ke halaman utama? 
+                    <a href="{{ url_for('index') }}" class="text-blue-600 hover:text-blue-700 font-medium">
+                        Halaman Utama
+                    </a>
+                </p>
+            </div>
 
-                        <div class="text-center">
-                            <p class="text-muted">
-                                Kembali ke halaman utama? 
-                                <a href="{{ url_for('index') }}" class="text-primary text-decoration-none fw-medium">
-                                    Halaman Utama
-                                </a>
-                            </p>
-                        </div>
-
-                        <div class="mt-4 p-3 bg-light rounded">
-                            <h6 class="fw-bold text-muted mb-2">Akun Demo:</h6>
-                            <div class="small text-muted">
-                                <div><strong>Admin:</strong> 001 / 123</div>
-                                <div><strong>Mechanic:</strong> 002 / 123</div>
-                                <div><strong>Quality Inspector:</strong> 003 / 123</div>
-                                <div><strong>Quality Verifier:</strong> 004 / 123</div>
-                                <div><strong>Super Admin:</strong> 005 / 123</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h6 class="font-semibold text-gray-700 mb-2">Akun Demo:</h6>
+                <div class="text-sm text-gray-600 space-y-1">
+                    <div><strong>Admin:</strong> 001 / 123</div>
+                    <div><strong>Mechanic:</strong> 002 / 123</div>
+                    <div><strong>Quality Inspector:</strong> 003 / 123</div>
+                    <div><strong>Quality Verifier:</strong> 004 / 123</div>
+                    <div><strong>Super Admin:</strong> 005 / 123</div>
                 </div>
             </div>
         </div>
