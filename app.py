@@ -16,7 +16,9 @@ app.jinja_env.loader.searchpath = [
     'templates/admin',
     'templates/mechanic',
     'templates/quality',
-    'templates/mws'
+    'templates/mws',
+    'templates/quality1',
+    'templates/quality2'
 ]
 
 # Data storage (in production, use a proper database)
@@ -317,7 +319,7 @@ def mechanic_dashboard():
     
     return render_template('mechanic/mechanic_dashboard.html', user=user, parts=user_parts, users=users)
 
-@app.route('/quality1-dashboard')
+@app.route('/quality2-dashboard')
 def quality1_dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
