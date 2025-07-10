@@ -16,9 +16,7 @@ app.jinja_env.loader.searchpath = [
     'templates/admin',
     'templates/mechanic',
     'templates/quality',
-    'templates/mws',
-    'templates/quality1',
-    'templates/quality2'
+    'templates/mws'
 ]
 
 # Data storage (in production, use a proper database)
@@ -319,7 +317,7 @@ def mechanic_dashboard():
     
     return render_template('mechanic/mechanic_dashboard.html', user=user, parts=user_parts, users=users)
 
-@app.route('/quality2-dashboard')
+@app.route('/quality1-dashboard')
 def quality1_dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
@@ -416,7 +414,7 @@ def mws_detail(part_id):
         return redirect(url_for('dashboard'))
     
     part = data['parts'][part_id]
-    return render_template('mws_detail.html', user=user, part=part, part_id=part_id, users=users)
+    return render_template('mws/mws_detail.html', user=user, part=part, part_id=part_id, users=users)
 
 @app.route('/create_mws')
 def create_mws():
@@ -424,7 +422,7 @@ def create_mws():
         flash('Hanya Admin yang dapat membuat MWS baru!', 'error')
         return redirect(url_for('dashboard'))
     
-    return render_template('create_mws.html', user=session['user'])
+    return render_template('admin/create_mws.html', user=session['user'])
 
 @app.route('/create_mws', methods=['POST'])
 def create_mws_post():
