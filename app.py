@@ -8,6 +8,17 @@ import hashlib
 app = Flask(__name__)
 app.secret_key = 'maintenance_worksheet_secret_key_2024'
 
+# Configure template folder structure
+app.jinja_env.loader.searchpath = [
+    'templates',
+    'templates/shared',
+    'templates/auth', 
+    'templates/admin',
+    'templates/mechanic',
+    'templates/quality',
+    'templates/mws'
+]
+
 # Data storage (in production, use a proper database)
 DATA_FILE = 'worksheet_data.json'
 USERS_FILE = 'users_data.json'
@@ -227,12 +238,12 @@ def get_default_data():
 @app.route('/')
 def index():
     data = load_data()
-    return render_template('index.html', parts=data['parts'])
+    return render_template('shared/index.html', parts=data['parts'])
 
 @app.route('/login')
 def login():
     role = request.args.get('role', '')
-    return render_template('login.html', selected_role=role)
+    return render_template('auth/login.html', selected_role=role)
 
 @app.route('/login', methods=['POST'])
 def login_post():
@@ -284,7 +295,7 @@ def admin_dashboard():
     # Admin can see all parts
     user_parts = data['parts']
     
-    return render_template('admin_dashboard.html', user=user, parts=user_parts, users=users)
+    return render_template('admin/admin_dashboard.html', user=user, parts=user_parts, users=users)
 
 @app.route('/mechanic-dashboard')
 def mechanic_dashboard():
@@ -304,7 +315,7 @@ def mechanic_dashboard():
     # Mechanic can only see assigned parts
     user_parts = {k: v for k, v in data['parts'].items() if v['assignedTo'] == user['nik']}
     
-    return render_template('mechanic_dashboard.html', user=user, parts=user_parts, users=users)
+    return render_template('mechanic/mechanic_dashboard.html', user=user, parts=user_parts, users=users)
 
 @app.route('/quality1-dashboard')
 def quality1_dashboard():
@@ -364,7 +375,7 @@ def superadmin_dashboard():
     # Super Admin can see all parts and manage everything
     user_parts = data['parts']
     
-    return render_template('superadmin_dashboard.html', user=user, parts=user_parts, users=users)
+    return render_template('admin/superadmin_dashboard.html', user=user, parts=user_parts, users=users)
 
 @app.route('/role-dashboard')
 def role_dashboard():
