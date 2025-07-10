@@ -6,6 +6,7 @@
     <title>{% block title %}Sistem Aircraft Maintenance Work Sheet{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
     <style>
         .role-admin { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
         .role-mechanic { background: linear-gradient(135deg, #10b981, #059669); }
@@ -100,13 +101,26 @@
     {% block content %}{% endblock %}
     
     <script>
+        // Get CSRF token
+        function getCSRFToken() {
+            const token = document.querySelector('meta[name="csrf-token"]');
+            return token ? token.getAttribute('content') : '';
+        }
+        
         // Auto-save functionality
         function updateField(endpoint, data) {
+            const csrfToken = getCSRFToken();
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+            
             fetch(endpoint, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: headers,
                 body: JSON.stringify(data)
             })
             .then(response => response.json())
@@ -136,31 +150,12 @@
             }, 3000);
         }
         
-        // Header update functions
-        function updateHeader(field, value) {
-            updateField('/update_header', {[field]: value});
-        }
-        
-        // Step update functions
-        function updateStep(stepNo, field, value) {
-            updateField('/update_step', {stepNo: stepNo, field: field, value: value});
-        }
-        
-        // Signature functions
-        function signDocument(type) {
-            updateField('/sign_document', {type: type});
-            setTimeout(() => location.reload(), 1000);
-        }
-        
-        // Date update functions
-        function updateDate(field, value) {
-            updateField('/update_dates', {field: field, value: value});
-        }
-
         // Mobile menu toggle
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
         }
 
         // Responsive table scroll
